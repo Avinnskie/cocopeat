@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 export default function HeroSection() {
     return (
         <div className="relative w-full min-h-screen overflow-hidden">
-            <Navbar />
             <Image
                 src="/images/bg.png"
                 alt="Images"
