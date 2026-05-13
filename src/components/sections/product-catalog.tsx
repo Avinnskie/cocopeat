@@ -9,7 +9,7 @@ function formatPrice(price: number): string {
 
 export default function ProductCatalog() {
   return (
-    <section className="py-16 sm:py-20 md:py-24 px-5 sm:px-8 md:px-12 lg:px-20">
+    <section id="product" className="py-16 sm:py-20 md:py-24 px-5 sm:px-8 md:px-12 lg:px-20">
       <div className="text-center space-y-4 mb-12">
         <p className="text-sm font-semibold text-[#16A34A] uppercase tracking-widest">
           KATALOG KAMI
@@ -63,8 +63,7 @@ export default function ProductCatalog() {
               </p>
               <div className="flex items-center gap-3">
                 <Button className="flex-1 bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold h-11 text-sm">
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
+                  Lihat Detail Product
                 </Button>
                 <Button
                   variant="outline"
@@ -81,7 +80,7 @@ export default function ProductCatalog() {
 
       <div className="text-center mt-10">
         <a
-          href="#"
+          href="/products"
           className="inline-flex items-center gap-2 text-[#16A34A] font-semibold text-sm hover:underline"
         >
           Lihat semua katalog <ArrowRight className="w-4 h-4" />
