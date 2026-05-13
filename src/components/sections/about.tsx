@@ -29,7 +29,7 @@ const benefits = [
 
 export default function AboutSection() {
   return (
-    <section className="py-2 min-h-128.75 px-2">
+    <section id="about" className="py-2 min-h-128.75 px-2">
       <div className="w-full h-full flex flex-col lg:flex-row gap-2">
         <div className="lg:col-span-1 space-y-4 bg-white w-full h-full lg:h-128.75
          flex flex-col justify-center px-5 py-5 md:pl-10 rounded-2xl">
