@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#E5E7EB" rx="12"/>
+  <rect x="50" y="70" width="140" height="100" fill="#92400E" rx="8"/>
+  <rect x="60" y="80" width="120" height="80" fill="#A16207" rx="4"/>
+  <text x="120" y="200" text-anchor="middle" fill="#6B7280" font-size="14" font-family="sans-serif">Cocopeat Block</text>
+</svg>
