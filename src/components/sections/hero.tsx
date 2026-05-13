@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CirclePlay, CheckCircle2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowRight } from "lucide-react";
 
 export default function HeroSection() {
   return (
@@ -30,26 +29,8 @@ export default function HeroSection() {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <Button className="h-12 px-6 sm:h-13 bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold text-sm sm:text-base w-full sm:w-auto rounded-lg">
-              Explore Products <ArrowRight className="w-4 h-4" />
+              Jelajahi Produk <ArrowRight className="w-4 h-4" />
             </Button>
-            <Button className="h-12 px-6 sm:h-13 bg-white hover:bg-white/90 text-black font-bold text-sm sm:text-base w-full sm:w-auto rounded-lg">
-              <CirclePlay className="w-4 h-4" /> Why Us?
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap gap-3 sm:gap-4 pt-1">
-            <Badge className="px-4 sm:px-5 py-3 gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs sm:text-sm whitespace-nowrap">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              High Retention
-            </Badge>
-            <Badge className="px-4 sm:px-5 py-3 gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs sm:text-sm whitespace-nowrap">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              100% Organic
-            </Badge>
-            <Badge className="px-4 sm:px-5 py-3 gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs sm:text-sm whitespace-nowrap">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Nationwide Ship
-            </Badge>
           </div>
         </div>
       </div>
