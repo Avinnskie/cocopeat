@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowUpRight, ArrowRight } from "lucide-react";
-import { products } from "@/src/data/products";
+import { products } from "@/data/products";
 
 function formatPrice(price: number): string {
   return `Rp ${price.toLocaleString("id-ID")}`;
