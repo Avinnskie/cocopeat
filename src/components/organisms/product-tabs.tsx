@@ -76,15 +76,6 @@ function ProductTabs({ product, className }: ProductTabsProps) {
                   </ul>
                 </div>
               )}
-
-              {product.farmerPartnership && (
-                <div className="mt-6 p-4 rounded-xl border border-[#46EC13]/20 bg-[#46EC13]/5">
-                  <h4 className="font-bold text-base mb-2">Kemitraan Petani</h4>
-                  <p className="text-sm text-gray-700">
-                    {product.farmerPartnership.description}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         )}

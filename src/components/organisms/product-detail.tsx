@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Price } from "@/components/ui/price";
 import { Rating } from "@/components/ui/rating";
 import { ImageGallery } from "@/components/molecules/image-gallery";
-import { QuantitySelector } from "@/components/molecules/quantity-selector";
 import { BatchTraceability } from "@/components/molecules/batch-traceability";
-import { SustainabilityBadges } from "@/components/molecules/sustainability-badges";
-import { FarmerPartnership } from "@/components/molecules/farmer-partnership";
 import type { Product } from "@/data/products";
 
 type ProductDetailProps = {
