@@ -37,6 +37,12 @@ export interface StorageInfo {
   waterRatio: string;
 }
 
+export interface FarmerPartnership {
+  farmerCount: number;
+  region: string;
+  description: string;
+}
+
 export interface TechnicalSpec {
   label: string;
   value: string;
@@ -65,6 +71,7 @@ export interface Product {
   applications?: UsageApplication[];
   comparison?: ComparisonItem[];
   storage?: StorageInfo;
+  farmerPartnership?: FarmerPartnership;
 }
 
 export const products: Product[] = [
@@ -178,6 +185,12 @@ export const products: Product[] = [
       shelfLife: "24 bulan (terkompresi)",
       rehydrationTime: "15-20 menit",
       waterRatio: "4-5L air per kg",
+    },
+    farmerPartnership: {
+      farmerCount: 45,
+      region: "Pontianak, Kalimantan Barat",
+      description:
+        "Bersumber langsung dari 45 petani kelapa di wilayah Pontianak. Setiap pembelian mendukung komunitas pertanian lokal dan mempromosikan praktik perdagangan yang adil.",
     },
   },
   {
