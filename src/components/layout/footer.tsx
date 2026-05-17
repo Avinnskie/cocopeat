@@ -2,7 +2,7 @@ import { Globe, ExternalLink } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white">
+    <footer className="border-t border-gray-200 bg-white mt-10">
       <div className="px-5 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           <div className="space-y-3">

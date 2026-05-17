@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 
 const navLinks = [
   { label: "Beranda", href: "/" },
@@ -62,7 +63,9 @@ export default function Navbar() {
         }`}
       >
         <div className="flex items-center justify-between">
+          <Link href={'/'}>
           <h1 className="font-bold text-lg sm:text-xl">Agropunggur.id</h1>
+          </Link>
 
           <div className="hidden md:flex items-center font-medium space-x-5 lg:space-x-8">
             {navLinks.map((link) => (
