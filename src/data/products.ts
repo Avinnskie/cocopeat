@@ -37,6 +37,12 @@ export interface StorageInfo {
   waterRatio: string;
 }
 
+export interface FarmerPartnership {
+  farmerCount: number;
+  region: string;
+  description: string;
+}
+
 export interface TechnicalSpec {
   label: string;
   value: string;
@@ -65,6 +71,7 @@ export interface Product {
   applications?: UsageApplication[];
   comparison?: ComparisonItem[];
   storage?: StorageInfo;
+  farmerPartnership?: FarmerPartnership;
 }
 
 export const products: Product[] = [
