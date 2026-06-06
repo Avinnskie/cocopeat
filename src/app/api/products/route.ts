@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
+    const products = await prisma.product.findMany({
+      include: {
+        specs: true,
+        technicalSpecs: true,
+        batchInfo: true,
+        sustainability: true,
+        applications: true,
+        comparison: true,
+        storage: true,
+        farmerPartnership: true,
+      },
+    });
     return NextResponse.json({
       success: true,
-      data: [],
-      count: 0,
+      data: products,
+      count: products.length,
     });
   } catch (error) {
     console.error("GET /api/products:", error);

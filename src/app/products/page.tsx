@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { products } from "@/data/products";
 import { ProductCard } from "@/components/organisms/product-card";
+import prisma from "@/lib/prisma";
+import { mapProduct } from "@/data/products";
 
 const filters = [
   { label: "Semua Product", active: true },
@@ -10,7 +11,21 @@ const filters = [
   { label: "Paketan", active: false },
 ];
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const dbProducts = await prisma.product.findMany({
+    include: {
+      specs: true,
+      technicalSpecs: true,
+      batchInfo: true,
+      sustainability: true,
+      applications: true,
+      comparison: true,
+      storage: true,
+      farmerPartnership: true,
+    },
+  });
+
+  const products = dbProducts.map(mapProduct);
   return (
     <section className="pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 md:pb-24 px-5 sm:px-8 md:px-12 lg:px-20">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">

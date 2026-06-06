@@ -2,9 +2,26 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { ProductCard } from "@/components/organisms/product-card";
-import { products } from "@/data/products";
+import prisma from "@/lib/prisma";
+import { mapProduct } from "@/data/products";
 
-export default function ProductCatalog() {
+export default async function ProductCatalog() {
+  const dbProducts = await prisma.product.findMany({
+    take: 3,
+    include: {
+      specs: true,
+      technicalSpecs: true,
+      batchInfo: true,
+      sustainability: true,
+      applications: true,
+      comparison: true,
+      storage: true,
+      farmerPartnership: true,
+    },
+  });
+
+  const products = dbProducts.map(mapProduct);
+
   return (
     <section
       id="product"

@@ -1,14 +1,15 @@
 import 'dotenv/config'
 import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
+import { env } from './lib/env.js'
 import { prisma, disconnectPrisma } from './lib/prisma.js'
 
 const app = express()
-const PORT = Number(process.env.PORT) || 4000
+const PORT = env.PORT
 
 // ─── Middleware ───────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: env.FRONTEND_URL,
   credentials: true,
 }))
 app.use(express.json())
@@ -33,9 +34,16 @@ app.get('/api/health', (_req: Request, res: Response) => {
 app.get('/api/products', async (_req: Request, res: Response) => {
   try {
     const products = await prisma.product.findMany({
-      where: { isActive: true },
-      include: { benefits: true },
-      orderBy: { createdAt: 'desc' },
+      include: {
+        specs: true,
+        technicalSpecs: true,
+        batchInfo: true,
+        sustainability: true,
+        applications: true,
+        comparison: true,
+        storage: true,
+        farmerPartnership: true,
+      },
     })
     res.json({ success: true, products })
   } catch (error) {
