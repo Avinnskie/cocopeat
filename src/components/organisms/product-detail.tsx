@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ShoppingCart, Heart, Share2, Check } from "lucide-react";
+import { ShoppingBag, Share2, Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,6 @@ type ProductDetailProps = {
 };
 
 function ProductDetail({ product, className }: ProductDetailProps) {
-  const [quantity, setQuantity] = React.useState(1);
-
   const galleryImages =
     product.gallery && product.gallery.length > 0
       ? product.gallery
@@ -34,15 +32,6 @@ function ProductDetail({ product, className }: ProductDetailProps) {
       {product.badge}
     </span>
   ) : null;
-
-  const inStock = (product.stock ?? 0) > 0;
-  const discount =
-    product.originalPrice && product.originalPrice > product.price
-      ? Math.round(
-          ((product.originalPrice - product.price) / product.originalPrice) *
-            100,
-        )
-      : 0;
 
   return (
     <div
@@ -69,14 +58,6 @@ function ProductDetail({ product, className }: ProductDetailProps) {
                 reviewCount={product.reviewCount}
               />
             )}
-            {inStock && (
-              <>
-                <span className="mx-2 text-gray-300">|</span>
-                <span className="text-sm text-[#16A34A] font-medium">
-                  Stok Tersedia
-                </span>
-              </>
-            )}
           </div>
           <h1 className="font-extrabold text-2xl sm:text-3xl md:text-4xl leading-tight">
             {product.name}
@@ -88,29 +69,46 @@ function ProductDetail({ product, className }: ProductDetailProps) {
 
         <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
           <div className="flex flex-wrap items-start justify-between gap-6 mb-6">
-            <div className="flex flex-col">
-              <Price
-                value={product.price}
-                size="xl"
-                className="text-3xl sm:text-4xl font-black"
-              />
-              <span className="text-sm text-muted-foreground">
-                Per 50kg Sack (Volume ~75L)
-              </span>
-            </div>
+            {product.price > 0 && (
+              <div className="flex flex-col">
+                <Price
+                  value={product.price}
+                  size="xl"
+                  className="text-3xl sm:text-4xl font-black"
+                />
+                <span className="text-sm text-muted-foreground">
+                  Per 50kg Sack (Volume ~75L)
+                </span>
+              </div>
+            )}
             {product.batchInfo && (
               <BatchTraceability batchInfo={product.batchInfo} />
             )}
           </div>
 
           <div className="flex gap-3">
-            <Button
-              disabled={!inStock}
-              className="flex-1 bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold h-12 text-sm sm:text-base shadow-lg shadow-[#46EC13]/20 hover:-translate-y-0.5 transition-all"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              Tambah ke Keranjang
-            </Button>
+            {product.shopeeUrl ? (
+              <Button
+                asChild
+                className="flex-1 bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold h-12 text-sm sm:text-base shadow-lg shadow-[#46EC13]/20 hover:-translate-y-0.5 transition-all"
+              >
+                <a
+                  href={product.shopeeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Beli di Shopee
+                </a>
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="flex-1 bg-gray-200 text-gray-500 font-bold h-12 text-sm sm:text-base cursor-not-allowed"
+              >
+                Tidak tersedia
+              </Button>
+            )}
           </div>
         </div>
 

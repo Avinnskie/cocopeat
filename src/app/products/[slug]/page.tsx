@@ -1,16 +1,23 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
-import { mapProduct } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
+import { createStaticClient } from "@/lib/supabase/static";
+import {
+  PRODUCT_RELATIONS_SELECT,
+  mapProduct,
+  type ProductRowWithRelations,
+} from "@/data/products";
 
 import { ProductDetail } from "@/components/organisms/product-detail";
 import { ProductTabs } from "@/components/organisms/product-tabs";
 import { ComparisonTable } from "@/components/organisms/comparison-table";
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({ select: { slug: true } });
-  return products.map((product) => ({ slug: product.slug }));
+  const supabase = createStaticClient();
+  const { data, error } = await supabase.from("Product").select("slug");
+  if (error || !data) return [];
+  return data.map((row) => ({ slug: row.slug }));
 }
 
 export async function generateMetadata({
@@ -19,13 +26,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await prisma.product.findUnique({
-    where: { slug },
-  });
-  if (!product) return { title: "Produk tidak ditemukan" };
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("Product")
+    .select("name, description")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (!data) return { title: "Produk tidak ditemukan" };
   return {
-    title: `${product.name} – Agropunggur`,
-    description: product.description,
+    title: `${data.name} – Agropunggur`,
+    description: data.description,
   };
 }
 
@@ -35,32 +46,22 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const supabase = await createClient();
 
-  const dbProduct = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      specs: true,
-      technicalSpecs: true,
-      batchInfo: true,
-      sustainability: true,
-      applications: true,
-      comparison: true,
-      storage: true,
-      farmerPartnership: true,
-    },
-  });
+  const { data: dbProduct, error } = await supabase
+    .from("Product")
+    .select(PRODUCT_RELATIONS_SELECT)
+    .eq("slug", slug)
+    .maybeSingle()
+    .overrideTypes<ProductRowWithRelations, { merge: false }>();
+
+  if (error) {
+    console.error("ProductDetailPage:", error);
+  }
 
   if (!dbProduct) notFound();
 
   const product = mapProduct(dbProduct);
-  const dbRelated = await prisma.product.findMany({
-    where: {
-      NOT: { slug },
-    },
-    take: 3,
-  });
-
-  const related = dbRelated.map(mapProduct);
 
   return (
     <section className="pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 md:pb-24 px-5 sm:px-8 md:px-12 lg:px-20">

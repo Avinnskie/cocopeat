@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Mail,
   Lock,
@@ -8,7 +9,6 @@ import {
   EyeOff,
   ArrowRight,
   AlertCircle,
-  ShieldCheck,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -26,6 +26,10 @@ type FormErrors = {
 };
 
 function LoginForm({ className }: LoginFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/admin";
+
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -57,8 +61,35 @@ function LoginForm({ className }: LoginFormProps) {
     }
     setErrors({});
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsSubmitting(false);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        setErrors({ general: json.message ?? "Gagal masuk. Coba lagi." });
+        return;
+      }
+
+      if (json.data?.user?.role !== "admin") {
+        setErrors({
+          general: "Akun ini bukan administrator.",
+        });
+        await fetch("/api/auth/logout", { method: "POST" });
+        return;
+      }
+
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
+      setErrors({ general: "Terjadi kesalahan jaringan. Coba lagi." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

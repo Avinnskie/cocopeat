@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
-const HIDDEN_PREFIXES = ["/login", "/register", "/forgot-password"];
+const HIDDEN_PREFIXES = ["/login", "/register", "/forgot-password", "/admin"];
 
 function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

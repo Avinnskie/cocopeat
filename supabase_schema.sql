@@ -1,19 +1,16 @@
--- SQL DDL Script for Supabase SQL Editor
--- This script creates the tables based on the required schema.
+-- SECURITY: Row Level Security is DISABLED on every public table.
+-- The product-images storage bucket has a fully-permissive policy that lets
+-- the anon API key read/write/delete any file in that bucket. Other storage
+-- buckets keep Supabase's default-deny RLS.
+-- The anon API key (NEXT_PUBLIC_SUPABASE_ANON_KEY) ships to every browser
+-- and grants:
+--   - full read/write/delete on every row in every public table via PostgREST
+--   - full read/write/delete on the product-images bucket via Storage API
+-- The only authorization layer is the application-side requireAdmin() guard
+-- in /api/admin/** route handlers. Direct REST/Storage calls bypass it.
+-- Do not store sensitive data in this database or in product-images.
 
--- Enable pgcrypto extension for gen_random_uuid() if not enabled
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- Drop tables if they exist to start clean (optional, be careful in production!)
--- DROP TABLE IF EXISTS "FarmerPartnership" CASCADE;
--- DROP TABLE IF EXISTS "StorageInfo" CASCADE;
--- DROP TABLE IF EXISTS "ComparisonItem" CASCADE;
--- DROP TABLE IF EXISTS "UsageApplication" CASCADE;
--- DROP TABLE IF EXISTS "SustainabilityMetric" CASCADE;
--- DROP TABLE IF EXISTS "BatchInfo" CASCADE;
--- DROP TABLE IF EXISTS "TechnicalSpec" CASCADE;
--- DROP TABLE IF EXISTS "ProductSpec" CASCADE;
--- DROP TABLE IF EXISTS "Product" CASCADE;
 
 -- 1. Table Product
 CREATE TABLE "Product" (
@@ -31,7 +28,8 @@ CREATE TABLE "Product" (
   stock INTEGER DEFAULT 0,
   rating DOUBLE PRECISION DEFAULT 0.0,
   "reviewCount" INTEGER DEFAULT 0,
-  highlights VARCHAR[] DEFAULT '{}'
+  highlights VARCHAR[] DEFAULT '{}',
+  "shopeeUrl" VARCHAR NOT NULL DEFAULT ''
 );
 
 -- 2. Table ProductSpec (Many-to-One)
@@ -108,10 +106,41 @@ CREATE TABLE "FarmerPartnership" (
   description TEXT NOT NULL
 );
 
--- Indices for performance
+-- 10. Indices
 CREATE INDEX IF NOT EXISTS "idx_product_slug" ON "Product"(slug);
 CREATE INDEX IF NOT EXISTS "idx_product_spec_product_id" ON "ProductSpec"("productId");
 CREATE INDEX IF NOT EXISTS "idx_technical_spec_product_id" ON "TechnicalSpec"("productId");
 CREATE INDEX IF NOT EXISTS "idx_sustainability_metric_product_id" ON "SustainabilityMetric"("productId");
 CREATE INDEX IF NOT EXISTS "idx_usage_application_product_id" ON "UsageApplication"("productId");
 CREATE INDEX IF NOT EXISTS "idx_comparison_item_product_id" ON "ComparisonItem"("productId");
+
+-- 11. Storage bucket: product-images
+-- Public bucket for admin-uploaded product photos. RLS on storage.objects
+-- is intentionally NOT configured here — see SECURITY note at the top of
+-- this file. Bucket-level constraints (size limit, allowed mime types) still
+-- apply.
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'product-images',
+  'product-images',
+  true,
+  5242880,
+  ARRAY['image/jpeg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+-- 12. Migration helpers (for projects that already have the old schema applied).
+-- Run these once if the project was deployed before shopeeUrl + the order purge.
+-- Safe to skip on a fresh install (the table create above already includes shopeeUrl).
+--
+--   ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "shopeeUrl" VARCHAR NOT NULL DEFAULT '';
+--   DROP TABLE IF EXISTS "OrderItem" CASCADE;
+--   DROP TABLE IF EXISTS "Order" CASCADE;
+--   DROP TYPE IF EXISTS "OrderStatus";
+--   DROP FUNCTION IF EXISTS create_order(VARCHAR, VARCHAR, VARCHAR, JSONB);
+--
+-- If a previous deploy applied RLS policies + is_admin() and you want to
+-- match this fresh-install schema, run supabase_migrations/003_disable_rls.sql.

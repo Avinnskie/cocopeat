@@ -2,25 +2,26 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { ProductCard } from "@/components/organisms/product-card";
-import prisma from "@/lib/prisma";
-import { mapProduct } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
+import {
+  PRODUCT_RELATIONS_SELECT,
+  mapProduct,
+  type ProductRowWithRelations,
+} from "@/data/products";
 
 export default async function ProductCatalog() {
-  const dbProducts = await prisma.product.findMany({
-    take: 3,
-    include: {
-      specs: true,
-      technicalSpecs: true,
-      batchInfo: true,
-      sustainability: true,
-      applications: true,
-      comparison: true,
-      storage: true,
-      farmerPartnership: true,
-    },
-  });
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("Product")
+    .select(PRODUCT_RELATIONS_SELECT)
+    .limit(3)
+    .overrideTypes<ProductRowWithRelations[], { merge: false }>();
 
-  const products = dbProducts.map(mapProduct);
+  if (error) {
+    console.error("ProductCatalog:", error);
+  }
+
+  const products = (data ?? []).map(mapProduct);
 
   return (
     <section

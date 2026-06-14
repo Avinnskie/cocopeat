@@ -10,7 +10,6 @@ const navLinks = [
   { label: "Beranda", href: "/" },
   { label: "Tentang Kami", href: "/#about" },
   { label: "Products", href: "/products" },
-  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar() {
@@ -82,9 +81,20 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <Button className="bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold text-sm sm:text-base px-5 py-2.5 h-auto rounded-lg">
-              Kontak Kami
-            </Button>
+            {process.env.NEXT_PUBLIC_SHOPEE_SHOP_URL && (
+              <Button
+                asChild
+                className="bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold text-sm sm:text-base px-5 py-2.5 h-auto rounded-lg"
+              >
+                <a
+                  href={process.env.NEXT_PUBLIC_SHOPEE_SHOP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Toko Shopee
+                </a>
+              </Button>
+            )}
           </div>
 
           <button
@@ -122,12 +132,21 @@ export default function Navbar() {
             ))}
           </div>
 
-          <Button
-            className="bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold w-full h-12 text-base"
-            onClick={() => setIsOpen(false)}
-          >
-            Kontak Kami
-          </Button>
+          {process.env.NEXT_PUBLIC_SHOPEE_SHOP_URL && (
+            <Button
+              asChild
+              className="bg-[#46EC13] hover:bg-[#3BD410] text-black font-bold w-full h-12 text-base"
+              onClick={() => setIsOpen(false)}
+            >
+              <a
+                href={process.env.NEXT_PUBLIC_SHOPEE_SHOP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Toko Shopee
+              </a>
+            </Button>
+          )}
         </div>
       </div>
     </>

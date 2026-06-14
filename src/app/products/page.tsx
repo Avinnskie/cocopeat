@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ProductCard } from "@/components/organisms/product-card";
-import prisma from "@/lib/prisma";
-import { mapProduct } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
+import {
+  PRODUCT_RELATIONS_SELECT,
+  mapProduct,
+  type ProductRowWithRelations,
+} from "@/data/products";
 
 const filters = [
   { label: "Semua Product", active: true },
@@ -12,20 +16,18 @@ const filters = [
 ];
 
 export default async function ProductsPage() {
-  const dbProducts = await prisma.product.findMany({
-    include: {
-      specs: true,
-      technicalSpecs: true,
-      batchInfo: true,
-      sustainability: true,
-      applications: true,
-      comparison: true,
-      storage: true,
-      farmerPartnership: true,
-    },
-  });
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("Product")
+    .select(PRODUCT_RELATIONS_SELECT)
+    .overrideTypes<ProductRowWithRelations[], { merge: false }>();
 
-  const products = dbProducts.map(mapProduct);
+  if (error) {
+    console.error("ProductsPage:", error);
+  }
+
+  const products = (data ?? []).map(mapProduct);
+
   return (
     <section className="pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 md:pb-24 px-5 sm:px-8 md:px-12 lg:px-20">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
