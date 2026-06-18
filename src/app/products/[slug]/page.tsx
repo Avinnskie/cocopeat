@@ -12,6 +12,7 @@ import {
 import { ProductDetail } from "@/components/organisms/product-detail";
 import { ProductTabs } from "@/components/organisms/product-tabs";
 import { ComparisonTable } from "@/components/organisms/comparison-table";
+import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   const supabase = createStaticClient();
@@ -24,7 +25,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
   const { data } = await supabase

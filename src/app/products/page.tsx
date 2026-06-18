@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { ProductFilter } from "@/components/organisms/product-filter";
 import { ProductCard } from "@/components/organisms/product-card";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -9,18 +7,40 @@ import {
   type ProductRowWithRelations,
 } from "@/data/products";
 
-const filters = [
-  { label: "Semua Product", active: true },
-  { label: "Sacks (50kg)", active: false },
-  { label: "Paketan", active: false },
-];
+export default async function ProductsPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const q = typeof searchParams?.q === "string" ? searchParams.q : "";
+  const filter = typeof searchParams?.filter === "string" ? searchParams.filter : "";
+  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : "";
 
-export default async function ProductsPage() {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("Product")
-    .select(PRODUCT_RELATIONS_SELECT)
-    .overrideTypes<ProductRowWithRelations[], { merge: false }>();
+
+  // 1. Inisiasi Query Database
+  let query = supabase.from("Product").select(PRODUCT_RELATIONS_SELECT);
+
+  // 2. Eksekusi Pencarian Nama
+  if (q) {
+    query = query.ilike("name", `%${q}%`);
+  }
+
+  // 3. Eksekusi Kategori
+  if (filter && filter !== "Semua Product") {
+    const keyword = filter.split(" ")[0]; // Mengambil "Sacks" atau "Paketan"
+    query = query.ilike("name", `%${keyword}%`);
+  }
+
+  // 4. Eksekusi Sortir Harga
+  if (sort === "termurah") {
+    query = query.order("price", { ascending: true });
+  } else if (sort === "termahal") {
+    query = query.order("price", { ascending: false });
+  } else {
+    query = query.order("name", { ascending: true }); // Default
+  }
+
+  const { data, error } = await query.overrideTypes<ProductRowWithRelations[], { merge: false }>();
 
   if (error) {
     console.error("ProductsPage:", error);
@@ -41,35 +61,19 @@ export default async function ProductsPage() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {filters.map((filter) => (
-              <Button
-                key={filter.label}
-                className={`rounded-full px-4 sm:px-5 h-9 sm:h-10 text-sm font-medium ${
-                  filter.active
-                    ? "bg-[#46EC13] hover:bg-[#3BD410] text-black"
-                    : "bg-[#F1F4F0] hover:bg-[#E5EAE3] text-black"
-                }`}
-              >
-                {filter.label}
-              </Button>
-            ))}
-          </div>
-
-          <div className="relative w-full lg:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Cari barang pada katalog kami"
-              className="h-10 sm:h-11 pl-10 text-sm sm:text-base"
-            />
-          </div>
-        </div>
+        {/* Pemanggilan komponen interaktif yang baru dibuat */}
+        <ProductFilter />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 pt-2">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products.length > 0 ? (
+            products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <div className="col-span-full py-10 text-center text-muted-foreground">
+              Produk tidak ditemukan.
+            </div>
+          )}
         </div>
       </div>
     </section>
