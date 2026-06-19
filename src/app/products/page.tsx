@@ -13,7 +13,6 @@ export default async function ProductsPage(props: {
   const searchParams = await props.searchParams;
   const q = typeof searchParams?.q === "string" ? searchParams.q : "";
   const filter = typeof searchParams?.filter === "string" ? searchParams.filter : "";
-  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : "";
 
   const supabase = await createClient();
 
@@ -25,20 +24,14 @@ export default async function ProductsPage(props: {
     query = query.ilike("name", `%${q}%`);
   }
 
-  // 3. Eksekusi Kategori
+  // 3. Eksekusi Kategori (Fungsi yang dimaksud teman Anda sebagai "Sorting")
   if (filter && filter !== "Semua Product") {
     const keyword = filter.split(" ")[0]; // Mengambil "Sacks" atau "Paketan"
     query = query.ilike("name", `%${keyword}%`);
   }
 
-  // 4. Eksekusi Sortir Harga
-  if (sort === "termurah") {
-    query = query.order("price", { ascending: true });
-  } else if (sort === "termahal") {
-    query = query.order("price", { ascending: false });
-  } else {
-    query = query.order("name", { ascending: true }); // Default
-  }
+  // Setelan Urutan Default (Alfabetis) agar data konsisten
+  query = query.order("name", { ascending: true });
 
   const { data, error } = await query.overrideTypes<ProductRowWithRelations[], { merge: false }>();
 
@@ -61,7 +54,6 @@ export default async function ProductsPage(props: {
           </p>
         </div>
 
-        {/* Pemanggilan komponen interaktif yang baru dibuat */}
         <ProductFilter />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 pt-2">
