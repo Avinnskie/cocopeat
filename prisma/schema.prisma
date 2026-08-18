@@ -1,0 +1,145 @@
+// Prisma schema for the Cocopeat Supabase Postgres database.
+//
+// SOURCE OF TRUTH: supabase_schema.sql + supabase_migrations/*.sql.
+// This schema mirrors those tables so Prisma can query them in a typed way;
+// it does not own them. Apply DDL through the SQL files, then run
+// `bun run db:pull` to bring the models back in sync.
+//
+// ⚠️  NEVER run `prisma migrate dev`, `migrate deploy`, or `migrate reset`
+// against this project. Prisma has no migration history for a schema Supabase
+// owns, so it reports drift and offers to reset — which DROPS the entire
+// `public` schema and every row in it. Use the SQL files instead.
+//
+// Column names are camelCase and quoted in Postgres, which matches Prisma's
+// default field-to-column mapping, so no @map directives are needed.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id              String   @id @db.VarChar
+  slug            String   @unique @db.VarChar
+  name            String   @db.VarChar
+  price           Decimal  @db.Decimal
+  originalPrice   Decimal? @db.Decimal
+  description     String
+  longDescription String?
+  image           String   @db.VarChar
+  gallery         String[] @default([]) @db.VarChar
+  badge           String?  @db.VarChar
+  badgeColor      String?  @db.VarChar
+  stock           Int?     @default(0)
+  rating          Float?   @default(0.0)
+  reviewCount     Int?     @default(0)
+  highlights      String[] @default([]) @db.VarChar
+  shopeeUrl       String   @default("") @db.VarChar
+
+  specs             ProductSpec[]
+  technicalSpecs    TechnicalSpec[]
+  sustainability    SustainabilityMetric[]
+  applications      UsageApplication[]
+  comparison        ComparisonItem[]
+  batchInfo         BatchInfo?
+  storage           StorageInfo?
+  farmerPartnership FarmerPartnership?
+
+  @@index([slug], map: "idx_product_slug")
+}
+
+model ProductSpec {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String @db.VarChar
+  label     String @db.VarChar
+  value     String @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_product_spec_product_id")
+}
+
+model TechnicalSpec {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String @db.VarChar
+  label     String @db.VarChar
+  value     String @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_technical_spec_product_id")
+}
+
+model BatchInfo {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId      String   @unique @db.VarChar
+  batchNumber    String   @db.VarChar
+  processingDate String   @db.VarChar
+  sourceLocation String   @db.VarChar
+  certifications String[] @default([]) @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model SustainabilityMetric {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String @db.VarChar
+  label     String @db.VarChar
+  value     String @db.VarChar
+  icon      String @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_sustainability_metric_product_id")
+}
+
+model UsageApplication {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId   String  @db.VarChar
+  name        String  @db.VarChar
+  icon        String  @db.VarChar
+  description String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_usage_application_product_id")
+}
+
+model ComparisonItem {
+  id               String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId        String @db.VarChar
+  metric           String @db.VarChar
+  cocopeatPlus     String @db.VarChar
+  regularSoil      String @db.VarChar
+  peatMoss         String @db.VarChar
+  importedCocopeat String @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_comparison_item_product_id")
+}
+
+model StorageInfo {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId       String   @unique @db.VarChar
+  instructions    String[] @default([]) @db.VarChar
+  shelfLife       String   @db.VarChar
+  rehydrationTime String   @db.VarChar
+  waterRatio      String   @db.VarChar
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model FarmerPartnership {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId   String @unique @db.VarChar
+  farmerCount Int
+  region      String @db.VarChar
+  description String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}

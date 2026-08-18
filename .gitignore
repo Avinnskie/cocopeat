@@ -41,6 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma — generated client, rebuilt by the postinstall hook
+/src/generated/
+
 package.json
 package-lock.json
 bun.lock

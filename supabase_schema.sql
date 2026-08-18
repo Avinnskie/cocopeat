@@ -10,7 +10,28 @@
 -- in /api/admin/** route handlers. Direct REST/Storage calls bypass it.
 -- Do not store sensitive data in this database or in product-images.
 
+-- ⚠️  NEVER run `prisma migrate dev` / `migrate deploy` / `migrate reset`
+-- against this database. Prisma has no migration history for a schema this
+-- file owns, so it reports drift and offers to reset — which DROPS the whole
+-- `public` schema and every row in it. This file is the only way to apply DDL.
+
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- 0. Schema grants.
+-- Supabase provisions these when the project is created, but anything that
+-- drops and recreates the `public` schema wipes them, and PostgREST then fails
+-- every request with `42501 permission denied for schema public`. Re-stating
+-- them here keeps this file sufficient to rebuild from nothing.
+-- Note this grants the anon role full table access — see the SECURITY note at
+-- the top of this file; it is the existing (RLS-disabled) design, not new.
+ALTER SCHEMA public OWNER TO pg_database_owner;
+GRANT USAGE ON SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO postgres, anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres, anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON ROUTINES TO postgres, anon, authenticated, service_role;
 
 -- 1. Table Product
 CREATE TABLE "Product" (
