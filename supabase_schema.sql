@@ -140,6 +140,17 @@ CREATE INDEX IF NOT EXISTS "idx_comparison_item_product_id" ON "ComparisonItem"(
 -- is intentionally NOT configured here — see SECURITY note at the top of
 -- this file. Bucket-level constraints (size limit, allowed mime types) still
 -- apply.
+--
+-- ⚠️  REQUIRED FOLLOW-UP: creating the bucket is not enough to make uploads
+-- work. Supabase keeps RLS permanently enabled on storage.objects, and a
+-- bucket with zero matching policies rejects every write with
+-- `new row violates row-level security policy`. After running this file you
+-- MUST also run:
+--
+--     supabase_migrations/004_open_storage_bucket.sql
+--
+-- Migrations 001-003 are already folded into the table definitions above and
+-- do not need re-running on a fresh install; 004 is the only one that does.
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
   'product-images',

@@ -39,7 +39,7 @@ export default function FundingSection() {
             className="px-5 sm:px-8 md:px-12 lg:px-20 pb-16 sm:pb-20"
         >
             <div className="rounded-3xl border border-gray-200 bg-white overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+                <div className="flex flex-col lg:flex-row">
                     <div className="p-6 sm:p-10 border-b lg:border-b-0 lg:border-r border-gray-200">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#16A34A]">
                             Didanai oleh
@@ -51,11 +51,11 @@ export default function FundingSection() {
                                 alt="Logo Kementerian Pendidikan Tinggi, Sains, dan Teknologi bersama Ditjen Risbang"
                                 width={752}
                                 height={166}
-                                className="h-auto w-full max-w-[19rem]"
+                                className="h-auto w-full max-w-[35rem]"
                             />
                         </figure>
 
-                        <ul className="mt-8 space-y-4 flex justify-between">
+                        <ul className="mt-8 space-y-4 flex flex-col lg:flex-row justify-between">
                             {INSTITUTIONS.map((institution) => (
                                 <li
                                     key={institution.abbr}
@@ -89,13 +89,13 @@ export default function FundingSection() {
                             Desa Punggur Besar
                         </p>
 
-                        <dl className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-px bg-gray-200 rounded-xl overflow-hidden">
+                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-px rounded-xl overflow-hidden">
                             {PROGRAM_DETAILS.map((detail) => (
                                 <div
                                     key={detail.term}
                                     className="bg-white py-3.5"
                                 >
-                                    <dt className="text-[11px] font-medium tracking-wider text-muted-foreground">
+                                    <dt className="text-[11px] font-medium text-muted-foreground">
                                         {detail.term}
                                     </dt>
                                     <dd className="mt-1 text-sm font-semibold text-foreground">
@@ -103,7 +103,7 @@ export default function FundingSection() {
                                     </dd>
                                 </div>
                             ))}
-                        </dl>
+                        </div>
                     </div>
                 </div>
             </div>
