@@ -1,7 +1,22 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowLeft, Leaf, ShieldCheck } from "lucide-react";
 
 import { LoginForm } from "@/components/organisms/login-form";
+
+/**
+ * Placeholder shown while the client-only LoginForm hydrates. Its height
+ * mirrors the real form (two fields + button) so the card does not jump.
+ */
+function LoginFormFallback() {
+  return (
+    <div className="space-y-4" aria-hidden="true">
+      <div className="h-10 rounded-md bg-gray-100 animate-pulse" />
+      <div className="h-10 rounded-md bg-gray-100 animate-pulse" />
+      <div className="h-10 rounded-md bg-gray-200 animate-pulse" />
+    </div>
+  );
+}
 
 export default function LoginPage() {
   return (
@@ -49,7 +64,11 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <LoginForm />
+            {/* useSearchParams() opts the subtree out of prerendering; the
+                boundary keeps the rest of this page static. */}
+            <Suspense fallback={<LoginFormFallback />}>
+              <LoginForm />
+            </Suspense>
           </div>
         </div>
       </main>
