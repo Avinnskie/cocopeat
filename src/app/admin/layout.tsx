@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/admin/logout-button";
 
 export const metadata: Metadata = {
-    title: "Admin – Agropunggur.id",
+    title: "Admin – Cocopeat+",
     robots: { index: false, follow: false },
 };
 
